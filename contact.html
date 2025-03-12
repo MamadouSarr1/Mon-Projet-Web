@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactez-nous - SenegalVoyages</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Header / Navigation -->
+    <header>
+        <nav>
+            <div class="logo">
+                <img class="logoImage" src="logo2-2.png" alt="SenegalVoyages Logo" />
+            </div>
+            <ul>
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="destination.php">Destinations</a></li>
+                <li><a href="reservation.html">Réservation</a></li>
+                <li><a href="galerie.html">Galerie</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Section Contact -->
+    <main>
+        <section id="contact" class="section">
+            <h2>Contactez-nous</h2>
+            <p>Pour toute question, écrivez-nous à <strong>contact@senegalvoyages.com</strong> ou remplissez le formulaire ci-dessous :</p>
+            <form id="contact-form">
+                <label for="nom">Nom :</label>
+                <input type="text" id="nom" name="nom" placeholder="Votre nom complet" required>
+
+                <label for="email">Email :</label>
+                <input type="email" id="email" name="email" placeholder="Votre email" required>
+
+                <label for="message">Message :</label>
+                <textarea id="message" name="message" rows="5" placeholder="Votre message" required></textarea>
+
+                <button type="submit">Envoyer</button>
+            </form>
+            <div id="responseMessage"></div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2025 SenegalVoyages - Tous droits réservés</p>
+    </footer>
+
+    <script>
+        document.getElementById('contact-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            document.getElementById('responseMessage').innerHTML = "Votre message a été envoyé. Merci de nous avoir contactés!";
+        });
+    </script>
+</body>
+</html>
