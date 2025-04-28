@@ -1,11 +1,11 @@
 /* --- Global Styles --- */
 :root {
-    --primary-color: #006747; /* Vert nature */
-    --secondary-color: #FCD116; /* Jaune lumineux */
-    --background-color: #f8f9fa; /* Gris clair */
-    --text-color: #333; /* Texte foncé */
-    --light-bg: #fff; /* Blanc */
-    --dark-bg: #333; /* Gris foncé */
+    --primary-color: #006747;
+    --secondary-color: #FCD116; 
+    --background-color: #f8f9fa; 
+    --text-color: #333; 
+    --light-bg: #fff; 
+    --dark-bg: #333; 
     --border-radius: 10px;
     --box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -32,7 +32,7 @@ a {
 
 /* --- Header --- */
 header {
-    background: rgba(0, 103, 71, 0.8); /* Vert nature */
+    background: rgba(0, 103, 71, 0.8); 
     padding: 20px 0;
     position: fixed;
     width: 100%;
@@ -41,6 +41,31 @@ header {
     z-index: 1000;
     box-shadow: var(--box-shadow);
 }
+.admin-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 140px; /* important si header fixe */
+}
+.form-container {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    max-width: 800px;
+    width: 100%;
+    margin-bottom: 30px;
+    text-align: center;
+    gap: 20px;
+}
+.section + .section {
+    margin-top: 40px;
+}
+.espace-sup {
+    margin-top: 50px;
+}
+
+
 
 nav {
     display: flex;
@@ -157,63 +182,82 @@ nav ul li a:hover {
     color: var(--primary-color);
     margin-bottom: 20px;
 }
-
 .destination-list {
     display: flex;
-    justify-content: space-around;
     flex-wrap: wrap;
-    gap: 20px;
+    justify-content: center;
+    gap: 30px; 
+    padding: 20px 0;
+}
+.destination-card h3 {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    font-size: 1.3rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 8px;
+    border-radius: 8px;
+    text-align: center;
+    text-shadow: 1px 1px 3px #000;
 }
 
 .destination-card {
+    width: 300px;
+    height: 300px;
+    border-radius: 15px;
+    background-size: cover;
+    background-position: center;
     position: relative;
-    background-color: #f1f1f1;
-    border-radius: var(--border-radius);
+    color: white;
+    text-decoration: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
     overflow: hidden;
-    box-shadow: var(--box-shadow);
-    margin: 10px;
-    width: 20%;
-    height: 300px; /* Ajustez la hauteur selon vos besoins */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer;
-    text-align: center;
-    background-size: cover; /* Assure que l'image de fond couvre le conteneur */
-    background-position: center; /* Centre l'image de fond */
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
 }
+
 
 .destination-card:hover {
     transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.destination-card img {
-    display: none; /* Cache l'image originale */
 }
 
 .destination-card h3 {
     position: absolute;
     top: 10px;
-    width: 100%;
-    z-index: 1; /* Assure que le texte est au-dessus de l'image de fond */
-    color: #fff;
-    padding: 10px;
-    margin: 0;
-    border-radius: var(--border-radius);
+    left: 10px;
+    right: 10px;
     text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    padding: 6px 10px;
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    margin: 0;
+    text-shadow: 1px 1px 3px #000;
 }
 
 .destination-card p {
     position: absolute;
     bottom: 10px;
-    width: 100%;
-    z-index: 1; /* Assure que le texte est au-dessus de l'image de fond */
-    background-color: rgba(0, 0, 0, 0.6); /* Fond semi-transparent pour le texte */
-    color: #fff;
+    left: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.75);
     padding: 10px;
-    margin: 0;
-    border-radius: var(--border-radius);
+    border-radius: 8px;
+    font-size: 0.85rem;
     text-align: center;
+    background-color: rgba(0, 0, 0, 0.75);
+    text-shadow: 1px 1px px #000, -1px -1px 2px #fff;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
+
 
 #destination-details img {
     max-width: 100%;
@@ -243,52 +287,14 @@ nav ul li a:hover {
 }
 
 .gallery-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px; 
     padding: 20px;
 }
 
-.gallery-item {
-    position: relative;
-    background-color: #f1f1f1;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--box-shadow);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
 
-.gallery-item:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-}
-
-.gallery-item img {
-    width: 100%;
-    height: auto;
-    transition: transform 0.3s ease;
-}
-
-.gallery-item:hover img {
-    transform: scale(1.1);
-}
-
-.gallery-item h3,
-.gallery-item p {
-    position: absolute;
-    bottom: 15px;
-    left: 15px;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    transition: 0.3s ease;
-}
-
-.gallery-item:hover h3,
-.gallery-item:hover p {
-    color: var(--secondary-color);
-}
 
 /* --- Footer --- */
 footer {
@@ -384,39 +390,60 @@ footer p {
     transform: scale(1.05);
 }
 
-/* --- Form --- */
-.admin-form, .login-form {
+
+.section-center {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh; 
+    padding-top: 100px; 
+    padding-bottom: 60px;
+    background-color: var(--background-color); 
+}
+
+
+.form-container {
+    background-color: #f4f4f4;
+    padding: 30px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     width: 100%;
-    max-width: 500px; /* Added max-width to limit the form width */
-    margin-top: 60px; /* Added margin to space the form from the header */
+    max-width: 450px;
+    text-align: center;
+    margin: 0 auto;
 }
 
-.admin-form label, .login-form label {
-    font-weight: bold;
+.form-container h2 {
+    color: #006644;
+    margin-bottom: 15px;
 }
 
-.admin-form input, .admin-form textarea, .login-form input {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 100%;
+.form-container p {
+    color: #333;
+    font-size: 1em;
+    margin-bottom: 10px;
 }
 
-.admin-form button, .login-form button {
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: 100%;
+/* Conteneur pour centrer les éléments */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-.admin-form button:hover, .login-form button:hover {
-    background-color: #0056b3;
+/* Titre de la section */
+.section-title {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+/* Description de la section */
+.section-description {
+    font-size: 1.2rem;
+    color: var(--text-color);
+    margin-bottom: 40px;
+    line-height: 1.6;
 }
 
 /* Table */
@@ -502,7 +529,7 @@ footer p {
     }
 
     header {
-        background: rgba(0, 103, 71, 0.9); /* Vert nature */
+        background: rgba(0, 103, 71, 0.9);
     }
 
     .destination-card,
@@ -513,4 +540,199 @@ footer p {
     footer {
         background-color: var(--dark-bg);
     }
+    
+}
+#contact {
+    padding: 120px 20px 60px;
+    background-color: var(--light-bg);
+    text-align: center;
+}
+
+#contact-form {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 30px;
+    background-color: #f1f1f1;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+#contact-form label {
+    text-align: left;
+    font-weight: bold;
+}
+
+#contact-form input,
+#contact-form textarea {
+    padding: 12px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+    width: 100%;
+}
+
+#contact-form textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+#contact-form button {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#contact-form button:hover {
+    background-color: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+#responseMessage {
+    margin-top: 20px;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.login-form {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f2f2f2;
+    border-radius: 10px;
+}
+
+.login-form .form-group {
+    margin-bottom: 15px;
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-form .btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #006644;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.erreur {
+    background-color: #ffdddd;
+    border: 1px solid #cc0000;
+    padding: 10px;
+    margin: 20px auto;
+    max-width: 400px;
+    color: #cc0000;
+    text-align: center;
+    border-radius: 5px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+/* --- Index Destination List --- */
+#index-destination-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+#index-destination-list .destination-card {
+    width: 200px;
+    height: 280px;
+    background-color: #e0f7fa;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#index-destination-list .destination-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* --- Destination Page List --- */
+#destination-page-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 40px;
+}
+
+#destination-page-list .destination-card {
+    width: 100%;
+    height: 320px;
+    background-color: #f1f1f1;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#destination-page-list .destination-card:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+#destination-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 100px 40px 40px;
+    align-items: flex-start;
+    justify-content: center;
+    background-color: var(--light-bg);
+}
+
+#destination-details img {
+    max-width: 500px;
+    width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    object-fit: cover;
+}
+
+#destination-details .description {
+    flex: 1;
+    min-width: 300px;
+    font-size: 1.1rem;
+    color: var(--text-color);
+    line-height: 1.6;
+    max-width: 600px;
+}
+
+#destination-details a {
+    display: inline-block;
+    margin-top: 20px;
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: underline;
 }

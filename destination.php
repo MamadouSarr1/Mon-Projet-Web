@@ -1,37 +1,22 @@
 <?php
-// Simulation d'une base de données avec un tableau PHP
-$destinations = [
-    [
-        "nom" => "Dakar",
-        "image" => "https://source.unsplash.com/400x300/?dakar,city",
-        "description" => "La capitale dynamique, avec l'île de Gorée, la mosquée de la Divinité et le Monument de la Renaissance Africaine."
-    ],
-    [
-        "nom" => "Saly",
-        "image" => "https://source.unsplash.com/400x300/?beach,africa",
-        "description" => "Destination balnéaire avec ses plages paradisiaques, activités nautiques et hôtels de luxe."
-    ],
-    [
-        "nom" => "Saint-Louis",
-        "image" => "https://source.unsplash.com/400x300/?history,africa",
-        "description" => "Ville historique classée à l’UNESCO, célèbre pour ses maisons coloniales et son festival de jazz."
-    ],
-    [
-        "nom" => "Parc du Niokolo-Koba",
-        "image" => "https://source.unsplash.com/400x300/?nature,park",
-        "description" => "Un sanctuaire pour la faune africaine, idéal pour les amateurs de safari et de nature."
-    ],
-    [
-        "nom" => "Lac Rose",
-        "image" => "https://source.unsplash.com/400x300/?lake,pink",
-        "description" => "Un lac unique au monde avec ses eaux roses dues à la forte salinité et aux micro-organismes."
-    ],
-    [
-        "nom" => "Désert de Lompoul",
-        "image" => "https://source.unsplash.com/400x300/?desert,dunes",
-        "description" => "Un paysage saharien magnifique avec ses dunes de sable doré et ses bivouacs sous les étoiles."
-    ]
-];
+// Connexion à la base de données
+$host = "localhost";
+$dbname = "sarrh25techinfo4_25mars2025";
+$username = "sarrh25techinfo4_ecrireSql";
+$password = "Informatique.101";
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    
+    // On récupère aussi l'id pour pouvoir faire le lien vers les détails
+    $stmt = $pdo->query("SELECT id, nom, image, description FROM destinations");
+    $destinations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    echo "<p style='color:red; text-align:center;'>Erreur de connexion : " . $e->getMessage() . "</p>";
+    $destinations = [];
+}
 ?>
 
 <!DOCTYPE html>
@@ -44,51 +29,43 @@ $destinations = [
 </head>
 <body>
 
-    <header>
-        <nav>
-            <div class="logo">SenegalVoyages</div>
-            <ul>
-                <li><a href="index.html">Accueil</a></li>
-                <li><a href="destination.php" class="active">Destinations</a></li>
-                <li><a href="reservation.html">Réservation</a></li>
-                <li><a href="galerie.html">Galerie</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-        </nav>
-    </header>
+<header>
+    <nav class="navbar">
+        <div class="logo">
+            <img class="logoImage" src="logo2-2.png" alt="SenegalVoyages Logo">
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.php">Accueil</a></li>
+            <li><a href="destination.php" class="active">Destinations</a></li>
+            <li><a href="reservation.php">Réservation</a></li>
+            <li><a href="galerie.html">Galerie</a></li>
+            <li><a href="contact.php">Contact</a></li>
+        </ul>
+    </nav>
+</header>
 
-    <main>
-        <section id="destinations">
-            <h2>Découvrez les plus belles destinations du Sénégal</h2>
-            <p>Explorez les merveilles du Sénégal à travers nos destinations incontournables.</p>
-
-            <div class="destination-container">
+<main>
+    <section id="destinations" class="section">
+        <div class="container">
+            <h2 class="section-title">Découvrez les plus belles destinations du Sénégal</h2>
+            <p class="section-description">Explorez les merveilles du Sénégal à travers nos destinations incontournables.</p>
+            <div id="index-destination-list" class="destination-list">
                 <?php foreach ($destinations as $destination) : ?>
-                    <div class="destination-card">
-                        <img src="<?= $destination['image'] ?>" alt="<?= $destination['nom'] ?>">
-                        <h3><?= $destination['nom'] ?></h3>
-                        <p><?= $destination['description'] ?></p>
-                        <a href="#" class="btn">Découvrir</a>
-                    </div>
+                    <a href="destination_details.php?destination=<?= $destination['id'] ?>" 
+                       class="destination-card" 
+                       style="background-image: url('<?= htmlspecialchars($destination['image']) ?>');">
+                        <h3><?= htmlspecialchars($destination['nom']) ?></h3>
+                        <p><?= htmlspecialchars(mb_strimwidth($destination['description'], 0, 100, "...")) ?></p>
+                    </a>
                 <?php endforeach; ?>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
+</main>
 
-    <footer>
-        <p>&copy; 2025 SenegalVoyages - Tous droits réservés</p>
-    </footer>
-
-    <script>
-        // Gestion du changement de fond de navigation lors du scroll
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 50) {
-                document.querySelector('header').classList.add('scrolled');
-            } else {
-                document.querySelector('header').classList.remove('scrolled');
-            }
-        });
-    </script>
+<footer>
+    <p>&copy; 2025 SenegalVoyages - Tous droits réservés</p>
+</footer>
 
 </body>
 </html>
