@@ -1,5 +1,8 @@
 <?php
+require_once __DIR__ . '/classes/sessionSet.include.php';
+require_once __DIR__ . '/classes/SelectUtilisateur.php';
 session_start();
+require_once 'config.php';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -14,7 +17,7 @@ session_start();
 <header>
     <nav>
         <div class="logo">
-            <img class="logoImage" src="logo2-2.png" alt="SenegalVoyages Logo" />
+            <img class="logoImage" src="images/logo2-2.png" alt="SenegalVoyages Logo" />
         </div>
         <ul>
             <li><a href="#accueil">Accueil</a></li>
@@ -29,6 +32,8 @@ session_start();
             <?php else: ?>
                 <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
                     <li><a href="admin.php">Administration</a></li>
+                <?php else: ?>
+                    <li><a href="mes_reservations.php">Mes réservations</a></li>
                 <?php endif; ?>
                 <li><a href="logout.php">Déconnexion</a></li>
             <?php endif; ?>
@@ -61,13 +66,8 @@ session_start();
 <?php endif; ?>
 
 <?php
-$host = "localhost";
-$dbname = "sarrh25techinfo4_25mars2025";
-$username = "sarrh25techinfo4_ecrireSql";
-$password = "Informatique.101";
-
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo = new PDO("mysql:host=" . DB_HOST . ";dbname=" . DB_NAME . ";charset=utf8", DB_USER, DB_PASS);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $stmt = $pdo->query("SELECT id, nom, image, description FROM destinations LIMIT 5");
     $destinations = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -82,9 +82,9 @@ try {
     <h2>Destinations Populaires</h2>
     <div id="index-destination-list" class="destination-list">
         <?php foreach ($destinations as $destination): ?>
-            <a href="destination_details.php?destination=<?= $destination['id'] ?>" 
-               class="destination-card" 
-               style="background-image: url('<?= htmlspecialchars($destination['image']) ?>');">
+            <a href="destination_details.php?destination=<?= $destination['id'] ?>"
+               class="destination-card"
+               style="background-image: url('images/<?= htmlspecialchars($destination['image']) ?>');">
                 <h3><?= htmlspecialchars($destination['nom']) ?></h3>
                 <p><?= htmlspecialchars($destination['description']) ?></p>
             </a>
@@ -141,7 +141,7 @@ try {
 </footer>
 
 <script>
-    document.getElementById('playPresentationButton').addEventListener('click', function(event) {
+    function playPresentationVideo(event) {
         event.preventDefault();
         var video = document.getElementById('presentationVideo');
         var backgroundVideo = document.getElementById('backgroundVideo');
@@ -152,9 +152,10 @@ try {
         button.textContent = 'Retour à la vidéo d\'accueil';
         button.removeEventListener('click', playPresentationVideo);
         button.addEventListener('click', returnToBackgroundVideo);
-    });
+    }
 
     function returnToBackgroundVideo(event) {
+        event.preventDefault();
         var video = document.getElementById('presentationVideo');
         var backgroundVideo = document.getElementById('backgroundVideo');
         var button = document.getElementById('playPresentationButton');
@@ -166,13 +167,15 @@ try {
         button.removeEventListener('click', returnToBackgroundVideo);
         button.addEventListener('click', playPresentationVideo);
     }
+
+    document.getElementById('playPresentationButton').addEventListener('click', playPresentationVideo);
+
     <?php if (isset($_SESSION['reservation_access'])): ?>
-            window.onload = () => {
-                document.getElementById("reservation")?.scrollIntoView({ behavior: "smooth" });
-            };
-        <?php 
-            unset($_SESSION['reservation_access']); 
-        endif; ?>
+        window.onload = () => {
+            document.getElementById("reservation")?.scrollIntoView({ behavior: "smooth" });
+        };
+        <?php unset($_SESSION['reservation_access']); ?>
+    <?php endif; ?>
 </script>
 </body>
 </html>

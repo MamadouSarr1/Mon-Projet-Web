@@ -1,33 +1,24 @@
 <?php
 require_once __DIR__ . '/classes/sessionSet.include.php';
+require_once __DIR__ . '/config.php'; 
 session_start();
 
-if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
+if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true || ($_SESSION['role'] ?? 'user') !== 'admin') {
     header("Location: login.php");
     exit;
 }
 
 $nom = htmlspecialchars($_SESSION['nom']);
 $email = htmlspecialchars($_SESSION['email']);
-$role = $_SESSION['role'] ?? 'user';
-
-$host = "localhost";
-$dbname = "sarrh25techinfo4_25mars2025";
-$username = "sarrh25techinfo4_ecrireSql";
-$password = "Informatique.101";
 
 $reservations = [];
+$erreur = null;
 
-if ($role === 'admin') {
-    try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $stmt = $pdo->query("SELECT * FROM reservations ORDER BY id DESC");
-        $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    } catch (PDOException $e) {
-        $erreur = "Erreur : " . $e->getMessage();
-    }
+try {
+    $stmt = $pdo->query("SELECT * FROM reservations ORDER BY id DESC");
+    $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+    $erreur = "Erreur : " . $e->getMessage();
 }
 ?>
 
@@ -36,14 +27,14 @@ if ($role === 'admin') {
 <head>
     <meta charset="UTF-8">
     <title>Admin - Réservations</title>
-    <link rel="stylesheet" href="styles.css"> <!-- ✅ Lien vers ton fichier CSS -->
+    <link rel="stylesheet" href="styles.css"> 
 </head>
 <body>
 
 <header>
     <nav class="navbar">
         <div class="logo">
-            <img src="logo2-2.png" alt="Logo" class="logoImage">
+            <img src="images/logo2-2.png" alt="Logo" class="logoImage">
         </div>
         <ul class="nav-links">
             <li><a href="index.php">Accueil</a></li>
@@ -53,8 +44,7 @@ if ($role === 'admin') {
 </header>
 
 <main class="admin-page">
-<section class="section espace-sup">
-
+    <section class="section espace-sup">
         <div class="form-container">
             <h2>Bienvenue, <?= $nom ?> !</h2>
             <p>Adresse courriel : <?= $email ?></p>
@@ -62,37 +52,36 @@ if ($role === 'admin') {
         </div>
     </section>
 
-    <?php if ($role === 'admin'): ?>
-        <section class="section espace-sup">
+    <section class="section espace-sup">
+        <div class="form-container">
+            <h2>Réservations enregistrées</h2>
 
-            <div class="form-container">
-                <h2>Réservations enregistrées</h2>
-
-                <?php if (!empty($reservations)): ?>
-                    <table class="destination-table">
-                        <thead>
+            <?php if ($erreur): ?>
+                <p style="color: red;"><?= htmlspecialchars($erreur) ?></p>
+            <?php elseif (!empty($reservations)): ?>
+                <table class="destination-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Destination</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($reservations as $res): ?>
                             <tr>
-                                <th>Nom</th>
-                                <th>Email</th>
-                                <th>Destination</th>
+                                <td><?= htmlspecialchars($res['nom']) ?></td>
+                                <td><?= htmlspecialchars($res['email']) ?></td>
+                                <td><?= htmlspecialchars($res['destination']) ?></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($reservations as $res): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($res['nom']) ?></td>
-                                    <td><?= htmlspecialchars($res['email']) ?></td>
-                                    <td><?= htmlspecialchars($res['destination']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                <?php else: ?>
-                    <p>Aucune réservation enregistrée.</p>
-                <?php endif; ?>
-            </div>
-        </section>
-    <?php endif; ?>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>Aucune réservation enregistrée.</p>
+            <?php endif; ?>
+        </div>
+    </section>
 </main>
 
 </body>

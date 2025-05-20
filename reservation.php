@@ -1,4 +1,12 @@
 <?php
+require_once __DIR__ . '/classes/sessionSet.include.php';
+require_once __DIR__ . '/classes/SelectUtilisateur.php';
+require_once __DIR__ . '/config.php';        
+require_once __DIR__ . '/fonctionMail.php';  
+require_once __DIR__ . '/env.php';  
+require_once __DIR__ . '/classes/fonctionsLogs.php';
+         
+
 session_start();
 
 if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
@@ -6,34 +14,47 @@ if (!isset($_SESSION['auth']) || $_SESSION['auth'] !== true) {
     exit;
 }
 
-$host = "localhost";
-$dbname = "sarrh25techinfo4_25mars2025";
-$username = "sarrh25techinfo4_ecrireSql";
-$password = "Informatique.101";
-
-$response = "";
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $nom = htmlspecialchars(trim($_POST["nom"]));
-    $email = $_SESSION["email"];
-    $destination = htmlspecialchars(trim($_POST["destination"]));
-
-    try {
-        $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $stmt = $pdo->prepare("INSERT INTO reservations (nom, email, destination) VALUES (?, ?, ?)");
-        $stmt->execute([$nom, $email, $destination]);
-
-        $_SESSION['confirmation'] = "Votre réservation pour <strong>$destination</strong> a été enregistrée avec succès.";
-    } catch (PDOException $e) {
-        $_SESSION['confirmation'] = "Erreur : " . $e->getMessage();
-    }
-
+// Vérification et assainissement de l'email
+$email = filter_var($_SESSION["email"], FILTER_VALIDATE_EMAIL);
+if (!$email) {
+    $_SESSION['confirmation'] = "Erreur : Email invalide.";
     header("Location: index.php#reservation");
     exit;
 }
 
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = $_SESSION["email"];
+    $destination = filter_input(INPUT_POST, 'destination', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
+    try {
+        $stmt = $pdo->prepare("INSERT INTO reservations (nom, email, destination) VALUES (:nom, :email, :destination)");
+        $stmt->execute([
+            ':nom' => $nom,
+            ':email' => $email,
+            ':destination' => $destination
+        ]);
+    
+        journaliser('insertion-bd.log', "Nouvelle réservation insérée par $email pour '$destination'");
+    
+        // Confirmation à l'utilisateur
+        $subject = "Confirmation de votre réservation";
+        $message = "Bonjour $nom,\n\nMerci pour votre réservation pour la destination : $destination.\n\nNous avons bien reçu votre demande et nous vous contacterons pour plus de détails.\n\nÀ bientôt sur SenegalVoyages!";
+        envoyerMail($email, $subject, $message);
+    
+        $_SESSION['confirmation'] = "Votre réservation pour <strong>$destination</strong> a été enregistrée avec succès.";
+    
+        if (defined('ADMIN_EMAIL')) {
+            $adminSubject = "Nouvelle réservation reçue";
+            $adminMessage = "Un client ($nom - $email) a réservé pour la destination : $destination.";
+            envoyerMail(ADMIN_EMAIL, $adminSubject, $adminMessage);
+        }
+    
+    } catch (PDOException $e) {
+        $_SESSION['confirmation'] = "Erreur : " . $e->getMessage();
+    }
+}    
 
 ?>
 
@@ -43,55 +64,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <title>Confirmation de Réservation</title>
     <link rel="stylesheet" href="styles.css">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-        }
+    
 
-        main.section {
-            max-width: 600px;
-            margin: 80px auto;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-
-        h2 {
-            color: #006747;
-            font-size: 2rem;
-            margin-bottom: 20px;
-        }
-
-        p {
-            font-size: 1.2rem;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        a.btn {
-            display: inline-block;
-            padding: 12px 24px;
-            background-color: #006747;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-            transition: 0.3s ease;
-        }
-
-        a.btn:hover {
-            background-color: #004d39;
-        }
-    </style>
 </head>
 <body>
     <main class="section">
         <h2>Réservation</h2>
-        <p><?php echo $response; ?></p>
+        <p><?php echo isset($response) ? htmlspecialchars($response) : ''; ?></p>
         <a href="index.php#reservation" class="btn">Retour</a>
     </main>
 </body>

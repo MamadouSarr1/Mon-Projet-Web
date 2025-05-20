@@ -1,27 +1,21 @@
-document.getElementById("reservation-form").addEventListener("submit", function(event) {
-    event.preventDefault(); // Empêcher le formulaire de se soumettre normalement
-    
-    // Récupérer les valeurs des champs
-    let nom = document.getElementById("nom").value;
-    let email = document.getElementById("email").value;
-    let destination = document.getElementById("destination").value;
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById("reservation-form");
+    const responseBox = document.getElementById("responseMessage");
 
-    // Créer une instance XMLHttpRequest pour l'AJAX
-    let xhr = new XMLHttpRequest();
-    xhr.open("POST", "traitement.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    form.addEventListener("submit", function (event) {
+        const nom = document.getElementById("nom").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const destination = document.getElementById("destination").value;
+        
 
-    // Gérer la réponse du serveur
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            // Afficher la réponse du serveur dans la div "responseMessage"
-            document.getElementById("responseMessage").innerHTML = xhr.responseText;
+        // Vérification simple côté client, SANS empêcher la soumission
+        if (!nom || !email || !destination) {
+            event.preventDefault(); // Empêche la soumission si vide
+            responseBox.innerHTML = '<div class="error">Veuillez remplir tous les champs avant de réserver.</div>';
         } else {
-            // En cas d'erreur
-            document.getElementById("responseMessage").innerHTML = "<p>Il y a eu une erreur lors de la réservation.</p>";
+           
+            responseBox.innerHTML = `<div class="success">Merci ${nom}, nous allons traiter votre réservation pour ${destination}.</div>`;
+          
         }
-    };
-
-    // Envoyer les données au serveur
-    xhr.send("nom=" + encodeURIComponent(nom) + "&email=" + encodeURIComponent(email) + "&destination=" + encodeURIComponent(destination));
+    });
 });

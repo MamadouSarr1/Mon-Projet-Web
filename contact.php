@@ -1,9 +1,5 @@
 <?php
-// Connexion à la base de données
-$host = "localhost";
-$dbname = "sarrh25techinfo4_25mars2025";
-$username = "sarrh25techinfo4_ecrireSql";
-$password = "Informatique.101";
+require_once 'config.php';
 
 $message = "";
 
@@ -39,7 +35,7 @@ try {
     <header>
         <nav class="navbar">
             <div class="logo">
-                <img class="logoImage" src="logo2-2.png" alt="SenegalVoyages Logo" />
+                <img class="logoImage" src="images/logo2-2.png" alt="SenegalVoyages Logo" />
             </div>
             <ul class="nav-links">
                 <li><a href="index.php">Accueil</a></li>

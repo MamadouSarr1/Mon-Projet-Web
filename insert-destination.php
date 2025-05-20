@@ -1,49 +1,50 @@
 <?php
-$host = "localhost";
-$dbname = "sarrh25techinfo4_25mars2025";
-$username = "sarrh25techinfo4_ecrireSql";
-$password = "Informatique.101";
+require_once __DIR__ . '/config.php'; // Séparer la connexion PDO
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    // Tableau de destinations à insérer
     $destinations = [
         [
             "nom" => "Dakar",
-            "image" => "dakar_city.jpg",
+            "image" => "images/dakar_city.jpg",
             "description" => "Capitale vibrante, entre plages et culture locale."
         ],
         [
             "nom" => "Saly",
-            "image" => "liitoral.jpg",
+            "image" => "images/liitoral.jpg",
             "description" => "Des plages paradisiaques à découvrir absolument."
         ],
         [
             "nom" => "Saint-Louis",
-            "image" => "saint-louis.jpg",
+            "image" => "images/saint-louis.jpg",
             "description" => "Plongez dans l'histoire avec son architecture coloniale."
         ],
         [
             "nom" => "Îles",
-            "image" => "goree.jpg",
+            "image" => "images/goree.jpg",
             "description" => "Découvrez la beauté naturelle des îles du Sénégal."
         ],
         [
             "nom" => "Parcs",
-            "image" => "cascade.jpg",
+            "image" => "images/cascade.jpg",
             "description" => "Explorez la faune et la flore des parcs nationaux."
         ]
     ];
 
+    // Requête préparée
+    $stmt = $pdo->prepare("INSERT INTO destinations (nom, image, description) VALUES (:nom, :image, :description)");
+
     foreach ($destinations as $dest) {
-        $stmt = $pdo->prepare("INSERT INTO destinations (nom, image, description) VALUES (?, ?, ?)");
-        $stmt->execute([$dest["nom"], $dest["image"], $dest["description"]]);
+        $stmt->bindParam(':nom', $dest["nom"]);
+        $stmt->bindParam(':image', $dest["image"]);
+        $stmt->bindParam(':description', $dest["description"]);
+        $stmt->execute();
     }
+
 
     echo "Les destinations ont été insérées avec succès.";
 
 } catch (PDOException $e) {
-    echo "Erreur : " . $e->getMessage();
+    echo "Erreur : " . htmlspecialchars($e->getMessage());
 }
 ?>

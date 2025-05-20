@@ -1,15 +1,13 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-ob_start(); // Démarre un tampon de sortie
-
+session_start(); 
 
 require_once __DIR__ . '/classes/sessionSet.include.php';
 require_once __DIR__ . '/classes/SelectUtilisateur.php';
+require_once __DIR__ . '/classes/fonctionsLogs.php';
 
-$message = "";
+$message = $_SESSION['error'] ?? '';
+$successMessage = $_SESSION['success'] ?? '';
+unset($_SESSION['error'], $_SESSION['success']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
@@ -26,30 +24,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['ip'] = $_SERVER['REMOTE_ADDR'];
             $_SESSION['role'] = method_exists($utilisateur, 'getRole') ? $utilisateur->getRole() : 'user';
 
-            // Redirection selon le rôle
+            journaliser("acces-reussis.log", "Connexion réussie : $email - IP : " . $_SERVER['REMOTE_ADDR']);
+
             if ($_SESSION['role'] === 'admin') {
                 header("Location: admin.php");
             } else {
                 $_SESSION['reservation_access'] = true;
-                header("Location: index.php#reservation");
+                $_SESSION['welcome'] = "Bienvenue " . $_SESSION['nom'] . ", vous êtes connecté !";
+                header("Location: mes_reservations.php");
             }
             exit;
         } else {
-            $logPath = __DIR__ . "/logs/login.log";
-            if (!is_dir(dirname($logPath))) {
-                mkdir(dirname($logPath), 0777, true);
-            }
-            error_log("[" . date("d/m/Y H:i:s") . "] Login invalide pour $email - IP: " . $_SERVER['REMOTE_ADDR'] . "\n", 3, $logPath);
+            journaliser("acces-refuses.log", "Échec de connexion : $email - IP : " . $_SERVER['REMOTE_ADDR']);
             $_SESSION['error'] = "Identifiants incorrects.";
-            header('Location: login.php');
+            header("Location: login.php");
             exit;
         }
     } else {
-        $message = "Champs invalides.";
+        $message = "Veuillez remplir tous les champs correctement.";
     }
 }
-
-ob_end_flush(); // Vide le tampon de sortie
 ?>
 
 <!DOCTYPE html>
@@ -60,10 +54,11 @@ ob_end_flush(); // Vide le tampon de sortie
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
 <header>
     <nav class="navbar">
         <div class="logo">
-            <img src="logo2-2.png" alt="Logo" class="logoImage">
+            <img src="images/logo2-2.png" alt="Logo" class="logoImage">
         </div>
         <ul class="nav-links">
             <li><a href="index.php">Accueil</a></li>
@@ -77,25 +72,28 @@ ob_end_flush(); // Vide le tampon de sortie
         <div class="form-container">
             <h2>Connexion utilisateur</h2>
 
+            <?php if (!empty($successMessage)) : ?>
+                <div class="success"><?= htmlspecialchars($successMessage) ?></div>
+            <?php endif; ?>
+
             <?php if (!empty($message)) : ?>
                 <div class="erreur"><?= htmlspecialchars($message) ?></div>
             <?php endif; ?>
 
             <form method="post" class="login-form">
-                <div class="form-group">
-                    <label for="email">Adresse courriel :</label>
-                    <input type="email" name="email" id="email" required>
-                </div>
+                <label for="email">Adresse courriel :</label>
+                <input type="email" name="email" id="email" required>
 
-                <div class="form-group">
-                    <label for="mot_de_passe">Mot de passe :</label>
-                    <input type="password" name="mot_de_passe" id="mot_de_passe" required>
-                </div>
+                <label for="mot_de_passe">Mot de passe :</label>
+                <input type="password" name="mot_de_passe" id="mot_de_passe" required>
 
                 <button type="submit" class="btn">Se connecter</button>
             </form>
+
+            <p>Pas encore de compte ? <a href="inscription.php">Inscrivez-vous</a></p>
         </div>
     </section>
 </main>
+
 </body>
 </html>

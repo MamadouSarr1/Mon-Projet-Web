@@ -1,29 +1,42 @@
 <?php
 require_once __DIR__ . '/classes/sessionSet.include.php';
 require_once __DIR__ . '/classes/Connexion.classe.php';
+require_once __DIR__ . '/classes/fonctionsLogs.php';
 
+session_start();
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $nom = trim($_POST['nom']);
-    $email = trim($_POST['email']);
-    $motDePasse = password_hash($_POST['mot_de_passe'], PASSWORD_DEFAULT);
+    $nom = filter_input(INPUT_POST, 'nom', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    $mot = filter_input(INPUT_POST, 'mot_de_passe', FILTER_UNSAFE_RAW);
 
-    try {
-        $connexion = (new Connexion())->getConnexionBd();
+    if (!$email || !$nom || !$mot) {
+        $message = "Veuillez fournir des informations valides.";
+    } else {
+        try {
+            $connexion = (new Connexion())->getConnexionBd();
 
-        $stmt = $connexion->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, date_creation) VALUES (:nom, :email, :mdp, NOW())");
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':email', $email);
-        $stmt->bindParam(':mdp', $motDePasse);
+            // Vérifie si l'email existe déjà
+            $stmt = $connexion->prepare("SELECT COUNT(*) FROM utilisateurs WHERE email = ?");
+            $stmt->execute([$email]);
+            if ($stmt->fetchColumn() > 0) {
+                $message = "Cette adresse courriel est déjà utilisée.";
+            } else {
+                // Insère l'utilisateur
+                $motDePasse = password_hash($mot, PASSWORD_DEFAULT);
+                $insert = $connexion->prepare("INSERT INTO utilisateurs (nom, email, mot_de_passe, date_creation) VALUES (?, ?, ?, NOW())");
+                $insert->execute([$nom, $email, $motDePasse]);
 
-        if ($stmt->execute()) {
-            $message = "Compte créé avec succès ! Vous pouvez maintenant vous connecter.";
-        } else {
-            $message = "Erreur lors de la création du compte.";
+                journaliser("insertion-bd.log", "Nouvelle inscription : $email ($nom)");
+
+                $_SESSION['success'] = "Compte créé avec succès ! Vous pouvez maintenant vous connecter.";
+                header("Location: login.php");
+                exit;
+            }
+        } catch (Exception $e) {
+            $message = "Erreur : " . $e->getMessage();
         }
-    } catch (Exception $e) {
-        $message = "Erreur : " . $e->getMessage();
     }
 }
 ?>
@@ -36,11 +49,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
 <header>
     <nav class="navbar">
         <div class="logo">
-            <img class="logoImage" src="logo2-2.png" alt="SenegalVoyages Logo" />
+            <img class="logoImage" src="images/logo2-2.png" alt="SenegalVoyages Logo" />
         </div>
         <ul class="nav-links">
             <li><a href="index.php">Accueil</a></li>
@@ -51,12 +63,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <main>
     <section class="section-center" id="inscription">
-
         <div class="form-container">
             <h2>Créer un compte</h2>
 
             <?php if (!empty($message)) : ?>
-                <div class="erreur"><?= htmlspecialchars($message) ?></div>
+                <div class="<?= str_contains($message, 'succès') ? 'success' : 'erreur' ?>">
+                    <?= htmlspecialchars($message) ?>
+                </div>
             <?php endif; ?>
 
             <form method="POST" action="inscription.php" class="login-form">
@@ -76,6 +89,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </div>
     </section>
 </main>
-
 </body>
 </html>
